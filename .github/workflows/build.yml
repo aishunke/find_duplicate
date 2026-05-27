@@ -1,6 +1,7 @@
 name: Build Windows EXE
 
 on:
+  workflow_dispatch:  # 添加这行，让你能手动触发
   push:
     tags:
       - "v*"
@@ -24,10 +25,10 @@ jobs:
 
     - name: Build EXE
       run: |
-        pyinstaller --onefile --noconsole run.py
+        pyinstaller --onefile --noconsole --add-data "app.py;." --name PDF_Tool run.py
 
     - name: Upload EXE
       uses: actions/upload-artifact@v4
       with:
         name: pdf-tool-exe
-        path: dist/run.exe
+        path: dist/*.exe
