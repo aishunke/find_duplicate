@@ -1,15 +1,15 @@
 name: Build Windows EXE
 
 on:
-  workflow_dispatch:  # 添加这行，让你能手动触发
+  workflow_dispatch:
   push:
     tags:
       - "v*"
 
 jobs:
-  build:
+  # Windows 构建（你已有的）
+  build-windows:
     runs-on: windows-latest
-
     steps:
     - uses: actions/checkout@v4
 
@@ -30,5 +30,32 @@ jobs:
     - name: Upload EXE
       uses: actions/upload-artifact@v4
       with:
-        name: pdf-tool-exe
+        name: windows-pdf-tool
         path: dist/*.exe
+
+  # ⭐ 新增：Mac 构建
+  build-macos:
+    runs-on: macos-latest  # 使用 macOS 环境
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build Mac executable
+      run: |
+        # macOS 打包（注意路径分隔符用 : 而不是 ;）
+        pyinstaller --onefile --noconsole --add-data "app.py:." --name PDF_Tool run.py
+
+    - name: Upload Mac executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-pdf-tool
+        path: dist/PDF_Tool
